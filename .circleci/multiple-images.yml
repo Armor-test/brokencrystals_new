@@ -1,0 +1,49 @@
+version: 2.1
+jobs:
+  build-and-push:
+    docker:
+      - image: existing_repo_cimg/basetesttest:2023.03  # CircleCI base image with common tools
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.7
+      - run:
+          name: Install AWS CLI
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Pull Various Images
+          command: |
+            docker pull ubuntu
+            docker pull cimg/base:2023.03
+            docker pull myrepo/app@sha256:893r27082fgugjkfgkfgafegw
+            docker pull registry.example.com/team/app:1.2.3
+            docker pull private-registry.example.com:5000/my-app:1.0
+            docker pull docker.io/library/ubuntu:latest
+            docker pull quay.io/organization/repository-name:tag
+            docker pull ghcr.io/owner/image-name:tag
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t mytestrepo/testImage:v1 .
+            docker build -t registry.example.com/team/app:1.2.3 .
+            docker build -t private-registry.example.com:5000/my-app:1.0 .
+      - run:
+          name: Push to ECR
+          command: |
+            # Log in to ECR
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
+            # Tag the image for ECR
+            docker tag mytestrepo/testImage:v1 $ECR_REPOSITORY_URI/mytestrepo/testImage:v1
+            docker tag registry.example.com/team/app:1.2.3 $ECR_REPOSITORY_URI/team/app:1.2.3
+            # Push the images to ECR
+            docker push $ECR_REPOSITORY_URI/mytestrepo/testImage:v1
+            docker push registry.example.com/team/app:1.2.3
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-and-push:
+          context: aws-credentials
