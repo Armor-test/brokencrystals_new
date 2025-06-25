@@ -1,0 +1,38 @@
+version: 2.1
+
+jobs:
+  build-and-push:
+    docker:
+      - image: existing_repo_cimg/basetesttest:2023.03  # CircleCI base image with common tools
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.7
+      - run:
+          name: Install AWS CLI
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t mytestrepo/testImage:v1 .
+      - run:
+          name: Push to ECR
+          command: |
+            # Log in to ECR
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
+            
+            # Tag the image for ECR
+            docker tag mytestrepo/testImage:v1 $ECR_REPOSITORY_URI/mytestrepo/testImage:v1
+            
+            # Push the image to ECR
+            docker push $ECR_REPOSITORY_URI/mytestrepo/testImage:v1
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-and-push:
+          context: aws-credentials
