@@ -28,7 +28,7 @@ npm ci --prefix client && npm run build --prefix client
 docker-compose --file=docker-compose.local.yml up -d
 
 #rebuild dockers
-docker-compose --file=docker-compose.local.yml up -d --build
+docker-compose --file=docker-compose.local.yml up -d --buil
 ```
 ## Running application with helm chart
 Helm command example:
