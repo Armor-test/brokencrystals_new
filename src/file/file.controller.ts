@@ -293,9 +293,16 @@ export class FileController {
     @Body() raw: string,
   ): Promise<string> {
     try {
+      const root = path.resolve(process.cwd());
+      const resolvedPath = path.resolve(root, file);
+
+      if (resolvedPath !== root && !resolvedPath.startsWith(root + path.sep)) {
+        throw new BadRequestException(`Invalid paramater 'path' ${file}`);
+      }
+
       if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
-        await fs.promises.access(path.dirname(file), W_OK);
-        await fs.promises.writeFile(file, raw);
+        await fs.promises.access(path.dirname(resolvedPath), W_OK);
+        await fs.promises.writeFile(resolvedPath, raw);
         return `File uploaded successfully at ${file}`;
       }
     } catch (err) {
