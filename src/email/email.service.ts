@@ -76,7 +76,7 @@ export class EmailService {
       to.toLowerCase().includes('%0a') ||
       to.toLowerCase().includes('%0d%0a')
     ) {
-      parsedSubject = /Subject:(.+?)(?=%0A)/i.exec(to);
+      parsedSubject = /Subject:([^%]+?)(?=%0A)/i.exec(to);
       parsedSubject = parsedSubject ? parsedSubject[1] : subject;
 
       parsedFrom = /From:(.+?)(?=%0A)/i.exec(to);
