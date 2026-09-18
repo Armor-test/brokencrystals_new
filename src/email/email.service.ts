@@ -79,8 +79,23 @@ export class EmailService {
       parsedSubject = /Subject:(.+?)(?=%0A)/i.exec(to);
       parsedSubject = parsedSubject ? parsedSubject[1] : subject;
 
-      parsedFrom = /From:(.+?)(?=%0A)/i.exec(to);
-      parsedFrom = parsedFrom ? parsedFrom[1] : from;
+      // Use linear-time string scanning instead of an unanchored regex here:
+      // matching "From:" (which can itself repeat many times in attacker
+      // input) followed by a lazy ".+?" scanning ahead for "%0A" causes the
+      // engine to re-scan the remainder of the string from every "From:"
+      // occurrence, which is O(n^2) on crafted input (CWE-1333/ReDoS).
+      const toLowerForFrom = to.toLowerCase();
+      const fromLabelIdx = toLowerForFrom.indexOf('from:');
+      parsedFrom = from;
+      if (fromLabelIdx !== -1) {
+        const fromDelimIdx = toLowerForFrom.indexOf(
+          '%0a',
+          fromLabelIdx + 'from:'.length,
+        );
+        if (fromDelimIdx !== -1) {
+          parsedFrom = to.substring(fromLabelIdx + 'from:'.length, fromDelimIdx);
+        }
+      }
 
       parsedTo = /(.+?)(?=%0A)/i.exec(to);
       parsedTo = parsedTo ? parsedTo[1] : to;
