@@ -16,13 +16,21 @@ export class AppService {
     private readonly userService: UsersService,
   ) {}
 
+  private static readonly ALLOWED_COMMANDS = new Set(['echo', 'ls', 'whoami']);
+
   async launchCommand(command: string): Promise<string> {
     this.logger.debug(`launch ${command} command`);
 
     return new Promise((res, rej) => {
       try {
         const [exec, ...args] = command.split(' ');
-        const ps = spawn(exec, args);
+
+        if (!AppService.ALLOWED_COMMANDS.has(exec)) {
+          rej(`Command not allowed: ${exec}`);
+          return;
+        }
+
+        const ps = spawn(exec, args, { shell: false });
 
         ps.stdout.on('data', (data: Buffer) => {
           this.logger.debug(`stdout: ${data}`);
