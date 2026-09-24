@@ -85,7 +85,7 @@ export class EmailService {
       parsedTo = /(.+?)(?=%0A)/i.exec(to);
       parsedTo = parsedTo ? parsedTo[1] : to;
 
-      parsedCc = /Cc:(.+?)(?=%0A)/i.exec(to) || /Cc:(.*)/i.exec(to);
+      parsedCc = /Cc:([^%]+?)(?=%0A)/i.exec(to) || /Cc:(.*)/i.exec(to);
       parsedCc = parsedCc ? parsedCc[1] : null;
 
       parsedBcc = /Bcc:(.+?)(?=%0A)/i.exec(to) || /Bcc:(.*)/i.exec(to);
