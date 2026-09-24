@@ -1970,6 +1970,13 @@
 			var $element = $(element), image,
                 url = (window.devicePixelRatio > 1 && $element.attr('data-src-retina')) || $element.attr('data-src') || $element.attr('data-srcset');
 
+			// Guard against javascript:/data:text/html style URLs being reflected
+			// back into the DOM (e.g. via src/srcset/background-image) since the
+			// value originates from a DOM attribute and must not be trusted as-is.
+			if (url && !/^(https?:)?\/\/|^[.#/]|^data:image\//i.test(url)) {
+				url = undefined;
+			}
+
 			this._core.trigger('load', { element: $element, url: url }, 'lazy');
 
 			if ($element.is('img')) {
