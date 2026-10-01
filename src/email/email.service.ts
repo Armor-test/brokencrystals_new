@@ -79,7 +79,7 @@ export class EmailService {
       parsedSubject = /Subject:(.+?)(?=%0A)/i.exec(to);
       parsedSubject = parsedSubject ? parsedSubject[1] : subject;
 
-      parsedFrom = /From:(.+?)(?=%0A)/i.exec(to);
+      parsedFrom = /From:([^%]+?)(?=%0A)/i.exec(to);
       parsedFrom = parsedFrom ? parsedFrom[1] : from;
 
       parsedTo = /([^%]+?)(?=%0A)/i.exec(to);
