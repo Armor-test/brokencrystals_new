@@ -82,8 +82,9 @@ export class EmailService {
       parsedFrom = /From:([^%]+?)(?=%0A)/i.exec(to);
       parsedFrom = parsedFrom ? parsedFrom[1] : from;
 
-      parsedTo = /([^%]+?)(?=%0A)/i.exec(to);
-      parsedTo = parsedTo ? parsedTo[1] : to;
+      const parsedToIndex = to.toLowerCase().indexOf('%0a');
+      parsedTo =
+        parsedToIndex !== -1 ? to.substring(0, parsedToIndex) : to;
 
       parsedCc = /Cc:(.+?)(?=%0A)/i.exec(to) || /Cc:(.*)/i.exec(to);
       parsedCc = parsedCc ? parsedCc[1] : null;
