@@ -71,7 +71,12 @@ export class AppController {
   async renderTemplate(@Body() raw): Promise<string> {
     if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
       const text = raw.toString().trim();
-      const res = dotT.compile(text)();
+      // Do not compile/evaluate user-provided input as a template; treat it as
+      // plain text to avoid arbitrary code execution via dot.js template syntax.
+      const res = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
       this.logger.debug(`Rendered template: ${res}`);
       return res;
     }
