@@ -71,9 +71,13 @@ export class AppController {
   async renderTemplate(@Body() raw): Promise<string> {
     if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
       const text = raw.toString().trim();
-      const res = dotT.compile(text)();
-      this.logger.debug(`Rendered template: ${res}`);
-      return res;
+      // Do not compile user-supplied text as a doT template: the entire
+      // template body originates from the request, so compiling/evaluating
+      // it would allow arbitrary code execution (CWE-94/95). Since there is
+      // no separate, trusted template to interpolate user data into, simply
+      // return the text unevaluated.
+      this.logger.debug(`Rendered template: ${text}`);
+      return text;
     }
   }
 
