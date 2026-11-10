@@ -91,6 +91,10 @@ async function bootstrap() {
         : null,
   });
 
+  const defaultRouteRateLimit = new Map<string, { count: number; resetAt: number }>();
+  const DEFAULT_ROUTE_RATE_LIMIT_WINDOW_MS = 60 * 1000;
+  const DEFAULT_ROUTE_RATE_LIMIT_MAX = 100;
+
   server.setDefaultRoute((req, res) => {
     if (req.url && req.url.startsWith('/api')) {
       res.statusCode = 404;
@@ -103,6 +107,24 @@ async function bootstrap() {
           },
         }),
       );
+    }
+
+    const clientKey =
+      (req.socket && req.socket.remoteAddress) || 'unknown';
+    const now = Date.now();
+    const entry = defaultRouteRateLimit.get(clientKey);
+    if (!entry || now > entry.resetAt) {
+      defaultRouteRateLimit.set(clientKey, {
+        count: 1,
+        resetAt: now + DEFAULT_ROUTE_RATE_LIMIT_WINDOW_MS,
+      });
+    } else {
+      entry.count++;
+      if (entry.count > DEFAULT_ROUTE_RATE_LIMIT_MAX) {
+        res.statusCode = 429;
+        res.end('Too Many Requests');
+        return;
+      }
     }
 
     readFile(
