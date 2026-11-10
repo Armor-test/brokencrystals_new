@@ -193,8 +193,7 @@ export class AppController {
       google_b64: 'QUl6YhT6QXlEQnbTr2dSdEI1W7yL2mFCX3c4PPP5NlpkWE65NkZV',
       google_oauth:
         '188968487735-c7hh7k87juef6vv84697sinju2bet7gn.apps.googleusercontent.com',
-      google_oauth_token:
-        'ya29.a0TgU6SMDItdQQ9J7j3FVgJuByTTevl0FThTEkBs4pA4-9tFREyf2cfcL-_JU6Trg1O0NWwQKie4uGTrs35kmKlxohWgcAl8cg9DTxRx-UXFS-S1VYPLVtQLGYyNTfGp054Ad3ej73-FIHz3RZY43lcKSorbZEY4BI',
+      google_oauth_token: 'REDACTED_GOOGLE_OAUTH_TOKEN',
       heroku:
         'herokudev.staging.endosome.975138 pid=48751 request_id=0e9a8698-a4d2-4925-a1a5-113234af5f60',
       hockey_app: 'HockeySDK: 203d3af93f4a218bfb528de08ae5d30ff65e1cf',
