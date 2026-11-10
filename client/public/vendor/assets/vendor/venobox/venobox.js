@@ -656,12 +656,22 @@
                 }
 
                 /* -------- LOAD AJAX -------- */
+                function sanitizeAjaxContent(html){
+                    // Strip <script> elements and inline event handler / javascript: URI
+                    // attributes from remotely-fetched HTML before it is inserted into
+                    // the DOM, to mitigate DOM-based XSS from untrusted ajax responses.
+                    var sanitized = String(html).replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+                    sanitized = sanitized.replace(/\s(on[a-z]+)\s*=\s*(".*?"|'.*?'|[^\s>]+)/gi, '');
+                    sanitized = sanitized.replace(/((?:href|src)\s*=\s*)(["']?)\s*javascript:[^"'>]*\2/gi, '$1$2#$2');
+                    return sanitized;
+                }
+
                 function loadAjax(){
                   $.ajax({
                   url: dest,
                   cache: false
                   }).done(function( msg ) {
-                      content.html('<div class="vbox-inline">'+ msg +'</div>');
+                      content.html('<div class="vbox-inline">'+ sanitizeAjaxContent(msg) +'</div>');
                       preloadFirst();
 
                   }).fail(function() {
