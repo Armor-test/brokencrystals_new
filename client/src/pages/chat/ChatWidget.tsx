@@ -10,7 +10,7 @@ import { queryChat } from '../../api/httpClient';
 import { ChatMessage } from '../../interfaces/ChatMessage';
 
 const UnsafeComponent: FC<{ html: string }> = ({ html }) => {
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return <div>{html}</div>;
 };
 
 export const ChatWidget: FC = () => {
