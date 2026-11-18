@@ -9,8 +9,8 @@ import { searchPartners, partnerLogin } from '../../../api/httpClient';
 import { Partner } from '../../../interfaces/Partner';
 
 export const Partners: FC = () => {
-  const PARTNER_DEFAULT_USERNAME = 'walter100';
-  const PARTNER_DEFAULT_PASSWORD = 'Heisenberg123';
+  const PARTNER_DEFAULT_USERNAME = process.env.REACT_APP_PARTNER_DEFAULT_USERNAME || '';
+  const PARTNER_DEFAULT_PASSWORD = process.env.REACT_APP_PARTNER_DEFAULT_PASSWORD || '';
 
   const [partners, setPartners] = useState<Array<Partner>>([]);
 
