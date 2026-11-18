@@ -661,7 +661,13 @@
                   url: dest,
                   cache: false
                   }).done(function( msg ) {
-                      content.html('<div class="vbox-inline">'+ msg +'</div>');
+                      // Sanitize remote content before injecting it into the DOM to
+                      // mitigate DOM-based XSS from untrusted/remote responses:
+                      // strip <script> elements and inline on*="" event handler attributes.
+                      var sanitized = String(msg)
+                          .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+                          .replace(/\son\w+\s*=\s*(".*?"|'.*?'|[^\s>]+)/gi, '');
+                      content.html('<div class="vbox-inline">'+ sanitized +'</div>');
                       preloadFirst();
 
                   }).fail(function() {
