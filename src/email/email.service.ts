@@ -88,8 +88,17 @@ export class EmailService {
       parsedCc = /Cc:(.+?)(?=%0A)/i.exec(to) || /Cc:(.*)/i.exec(to);
       parsedCc = parsedCc ? parsedCc[1] : null;
 
-      parsedBcc = /Bcc:(.+?)(?=%0A)/i.exec(to) || /Bcc:(.*)/i.exec(to);
-      parsedBcc = parsedBcc ? parsedBcc[1] : null;
+      const bccMarkerIndex = to.toLowerCase().indexOf('bcc:');
+      if (bccMarkerIndex === -1) {
+        parsedBcc = null;
+      } else {
+        const afterBcc = to.substring(bccMarkerIndex + 'bcc:'.length);
+        const delimiterIndex = afterBcc.toLowerCase().indexOf('%0a');
+        parsedBcc =
+          delimiterIndex === -1
+            ? afterBcc
+            : afterBcc.substring(0, delimiterIndex);
+      }
     }
 
     this.logger.debug(
